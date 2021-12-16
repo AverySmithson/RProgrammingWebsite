@@ -1,7 +1,9 @@
 ---
-title: "About this site"
+title: "About"
 description: |
-  Some additional details about the website
+  This website is meant to serve as a intro guide for anyone wanting to learn the basics about how programming in R works (specifically for statsitical purposes). Once you have these basics down, I hope it will help you to be more confident in learning how to do more advanced things using R. All the data I use comes from Our World in Data, specifially the mental health data. I was able to find and use a package to bring this data into R to make that process a little bit easier. 
+  
+  I hope you find my tips about R useful!
 ---
 
 ```{r setup, include=FALSE}

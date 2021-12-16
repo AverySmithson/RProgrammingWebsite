@@ -2509,8 +2509,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <h5 id="example-1-lets-start-with-rnorm-simulating-data-for-a-normal-distribution-for-mean-1-and-standard-deviation-0-and-n-10.-a-normal-distribution-is-one-of-the-first-things-you-learn-about-in-an-intro-stats-class-and-it-is-one-of-the-most-commonly-talked-about-distributions-throughout-statistics.">Example 1: Let’s start with rnorm, simulating data for a normal distribution for mean = 1 and standard deviation = 0 and n = 10. A normal distribution is one of the first things you learn about in an intro-stats class, and it is one of the most commonly talked about distributions throughout statistics.</h5>
 <p><code>r template: rnorm(n, mean = __, sd = __)</code> <code>r code: rnorm(10, mean = 0, sd = 1)</code></p>
 <div class="layout-chunk" data-layout="l-body">
-<pre><code> [1] -0.912863899  0.949210625 -1.113941681 -1.106708616  0.076497727
- [6] -0.546240150 -0.805317831  1.454871674 -0.001745489 -1.537215938</code></pre>
+<pre><code> [1]  0.72338200 -0.29145738 -0.53281224 -0.66074058 -0.06319152
+ [6]  1.27502755  1.26652808  1.56988915 -0.02836657  0.35436317</code></pre>
 </div>
 <p>This generates 10 random numbers for us following the parameters of mean = 0 and sd = 1</p>
 <p>Here’s another way to simulate 10 random numbers for mean = 0 and sd = 1:</p>
@@ -2520,31 +2520,31 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <p>x &lt;- rnorm(10)</p>
 <p>x</p>
 <div class="layout-chunk" data-layout="l-body">
-<pre><code> [1] -0.16330369  0.13092329  0.72438757 -0.66871643  0.02968228
- [6] -1.02378013  0.11668986 -0.95895249 -0.37735768 -1.01376072</code></pre>
+<pre><code> [1] -0.43398226  1.19192342 -0.05717483 -0.61234341 -0.16691125
+ [6] -0.45189679 -0.71939837  0.79771009 -0.83618724 -1.53785681</code></pre>
 </div>
 <p>What does it look like if we change the mean and sd from the default values? Let’s look at normal distribution for 50 values, mean = 10, and sd = 5. let’s assign this to the letter r:</p>
 <p>r &lt;- rnorm(50, mean = 10, sd = 5)</p>
 r
 <div class="layout-chunk" data-layout="l-body">
-<pre><code> [1] 12.2029137  8.8497531  3.4250106  4.7411298  9.9775036  3.3795965
- [7]  7.8423198  4.3373310  8.7336344 13.2603188  2.1691043 15.9664552
-[13] 16.2254995  4.5435073  7.3063293 -0.8728896 -4.1321830 11.6167525
-[19]  4.3870548  3.7478208  6.3013704 15.9916336 12.0399418  4.9466766
-[25]  6.7576201  4.6592667 13.4406968 13.6146202  7.2579480  1.5674626
-[31] 15.6650529  8.0371120  4.4254964 13.9608393 12.7557229  6.5137373
-[37] 10.8380306  8.2401563  5.4638663 11.5126727 12.2839263 11.0110718
-[43] 11.7851499 -1.8262129  6.1552962 18.4743950  8.7514787 17.0706969
-[49]  5.9391100 -0.9621116</code></pre>
+<pre><code> [1] 12.122183  9.638608  8.877435  4.637951 12.783859 16.213558
+ [7]  9.416814 17.375680 10.533823 19.404536  7.477551 11.233397
+[13] 10.849192 14.178462 13.046885  5.793018 13.656954 10.772188
+[19] 18.140034  9.794177  6.350558 12.752163  7.309125  1.288136
+[25] 24.510008 12.940634  8.659188  9.574049  5.340550 12.553320
+[31]  8.219366  2.927801  5.680411 10.676949  2.339855  8.030313
+[37] 12.524833 18.097365  3.884412 19.727718 17.780980  8.595801
+[43] 16.420528  9.173655  8.926459  9.137858  9.332234  5.779354
+[49]  7.888330  5.612186</code></pre>
 </div>
 <p>We get 50 random numbers with much larger values than when we did mean = 0 and sd = 1. Lets look at the 5 number summaries for both x and r to compare:</p>
 <p>summary(x)</p>
 <p>summary(r)</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
--1.02378 -0.88639 -0.27033 -0.32042  0.09494  0.72439 </code></pre>
+-1.53786 -0.69263 -0.44294 -0.28261 -0.08461  1.19192 </code></pre>
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- -4.132   4.572   7.940   8.208  12.162  18.474 </code></pre>
+  1.288   7.580   9.606  10.560  12.901  24.510 </code></pre>
 </div>
 <p>We see that when comparing the summaries of r and x, r has a much larger range of values and that the median and mean are both much higher. This was to be expected since we increased the mean and sd of r!</p>
 <p>Now that we learned the basics of how to produce random numbers, we need to learn how to make these numbers/results reproducible. We can do this by setting a seed. The set.seed() function does this for us. When you set the seed, you can set it to any number you want, just be sure it is something easy to remember and simple to use (i.e. I wouldn’t recommend using a 10-digit number as that could become annoying to use and it could become easy to make a typo).</p>
