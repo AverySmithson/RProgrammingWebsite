@@ -1,0 +1,635 @@
+---
+title: "Intro Guide to Programming in R"
+description: |
+  Welcome to my website. I hope you enjoy it and learn the basics of R programming!
+site: distill::distill_website
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# Learn more about creating websites with Distill at:
+# https://rstudio.github.io/distill/website.html
+
+```
+
+# Some Tips About R Syntax
+
+Here are some basics about R syntax and some tips to keep in mind along the way:
+
+1. To leave a comment or note in your code that you do not want R to read, use a #.
+#Example: R is not going to read this chunk of text because I started this line with a #.
+If your comment is more than one line, each line must start with a #. Leaving comments is such an important part of coding in any language. Use comments to your advantage to make your code more readable. Using comments helps others and yourself understand your code. If you walk away from your code and at a later time can't recall the goal, that means someone else likely won't understand either and you should add more/better comments!
+
+2. To run a chunk of code in R, simply put your cursor anywhere with in that chunk of code and hit control + enter (or command + return for Mac's) on your keyboard.
+
+3. Most of the time, strings of text need to be captured in quotation marks for R to understand what you are trying to say.
+
+4. I recommend typing your code in the R-script window as this allows you to make edits and corrections to your code
+
+5. When installing packages, the package name must be enclosed in quotations and parentheses
+
+6. Always make sure your parentheses and quotation marks have and **opening and closing**. Forgetting to close a parenthesis or quotation will result in an error. The easiest way to avoid this error is making sure your parentheses and quotation marks are closed before adding any text to them. You can also turn on rainbow parentheses in settings by going to code in the menu bar and then selecting rainbow parentheses. 
+
+###################
+###################
+
+# Managing Data
+
+In this section I want to discuss and demonstrate some ways to manage data using the tidyverse package and janitor package. The tidyverse package has several other packages within it that I will be using throughout the rest of the website (mainly dplyr, tibble, and ggplot2). The janitor package will be used to help us clean up variable names as necessary. 
+
+Step 1: Lets make sure all the packages we will need are installed at the beginning so they will be easy to find later. The tidyverse and janitor packages will help us to manage and visualize our data, and the owidR package is where I will be accessing all of the data I want to use. This data comes from Our World in Data: Mental Health Data.
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(owidR)
+```
+
+Below I am using the search function from the owidR package to find a dataset of interset. Then, I am assigning the dataset of interest to the name "substancedisorder". Next, I am viewing the raw dataset and turning it into a tibble so that it is easier for R to work with since this is a very large dataset. 
+
+```{r}
+# owid_search("disorder") #Viewing all mental health related data sets in owid
+substancedisorder <- owid("share-with-mental-and-substance-disorders") #making a data frame from this data set
+view(substancedisorder) #viewing the raw data
+as_tibble(substancedisorder) #turning this data frame into a tibble -- makes it easier for R to display since this is a large data set
+```
+
+##### Now that we have our packages and data all set up, here is what we will be doing in this section:
+
+1. using dyplr to isolate data (filter, select, arrange, %>%)
+2. Use select to extract columns
+3. Use filter to: extract rows
+4. Use arrange to: move important rows to the top of the data frame (table) 
+
+First, we want to rename the prevalence variable from our substance disoder data set because right now it is unnecessarily long. We are going to do this with the janitor package that is very helpful in cleaning names. The janitor packages removes all unique characters and replaces spaces with "_". Then we are going to rename using dyplyr to make the name shorter and more convenient. I use a pipe (%>%) here to make this a little easier, and I will describe more how pipes work later.
+
+```{r}
+substancedisorder <- substancedisorder %>%
+  clean_names() %>%
+  rename(prevalence = prevalence_mental_and_substance_use_disorders_sex_both_age_age_standardized_percent) 
+    
+
+view(substancedisorder) #making sure that the variable name looks the way I want it to!
+```
+
+##### Example 1: use select to extract entity (country) column.
+` r template:  select(data-frame, column-name) `
+` r code: select(substancedisorder, entity) `
+```{r}
+select(substancedisorder, entity)
+```
+
+
+##### Example 2: use select to extract entity, year, and prevalence
+
+` r code: select(substancedisorder, entity, year, prevalence) `
+
+```{r}
+select(substancedisorder, entity, year, prevalence)
+```
+
+There are lots of other helper functions we can use with the select() argument. This helps us to selects lots of columns that might have the same suffix or prefix (in addition to many other options).
+
+##### Example 3: Using contains() helper function
+
+` r code: select(substancedisorder, contains("n")) `
+```{r}
+select(substancedisorder, contains("n"))
+```
+
+This only selected columns "entity" and "prevalence" since those were the only two columns with an "n" in their name! If we had two columns that both started with the suffix "pre" we could have used the helper starts_with() inside of the select argument.
+
+Takeaway: We can select whatever columns we want, in many different ways to make our lives easier!
+
+Now we are going to learn how to use the filter() argument to extract rows of data and turn them into a new data-frame. 
+` r template: filter(data-frame, column-name == "variable-name") `
+One important thing to note in the filter argument is the **double equal sign**. Another important thing to notice is that filter extracts **rows** of an existing data-frame and returns them as a new data-frame.
+
+##### Example 4: Filtering rows where entity = Albania
+` r code: filter(substancedisorder, entity == "Albania") `
+```{r}
+filter(substancedisorder, entity == "Albania")
+```
+
+##### Example 5: Filtering rows where entity = Afghanistan **AND** prevalence > 18.0
+
+` r code: filter(substancedisorder, entity == "Afghanistan" & prevalence > 18.0) `
+```{r}
+ filter(substancedisorder, entity == "Afghanistan" & prevalence > 18.0)
+```
+
+Note: Afghanistan needs to be a quotation marks because it is character, and prevalence does not need quotation marks because it is numeric. 
+
+##### Some common mistakes that you want to be sure to avoid are:
+1. Missing the double equal sign,
+2. Mis-using quotation marks
+
+Now, we are going to learn how to use the arrange() function. arrange() reorders the way your rows are set up
+` r template: arrange(data-frame, column-name(s)) `
+
+Note: you can arrange by a single column name or by multiple columns. 
+
+##### Example 6: arranging substancedisorder by year:
+` r code: arrange(substancedisorder, year) `
+```{r}
+arrange(substancedisorder, year)
+```
+Note: R automatically arranged the column year in ascending order. Looks what happens when we arrange by code.
+
+` r code: arrange(substancedisorder, code) `
+
+```{r}
+arrange(substancedisorder, code)
+```
+
+R automatically arranged the column code in alphabetical order.
+
+##### Example 7: Lets to arrange substance disorder by both year and prevalence
+
+` r code: arrange(substancedisorder, year, prevalence) `
+
+```{r}
+arrange(substancedisorder, year, prevalence)
+```
+
+R first arranged the column year in ascending order and then arranced prevalence within year. 
+
+Note: the order you put the column names matters. The column name you put first will be how your data-frame gets primarily arranged by. Lets see what it looks like if we arrange by prevalence and then year.
+
+` r code: arrange(substancedisorder, prevalence, year) `
+
+```{r}
+arrange(substancedisorder, prevalence, year)
+```
+
+As you can see, by simple changing the order of year and prevalence, we get two very different looking data-frames.
+
+Like I said before, R automatically arranges in ascending order, however, we can change that by using the desc() argument for a column name.
+
+##### Example 8: Sort the table first by descending prevalence and then by year:
+
+` r code: arrange(substancedisorder, desc(prevalence), year) `
+
+```{r}
+arrange(substancedisorder, desc(prevalence), year)
+```
+
+By doing this, we get the highest prevalence rates first, and then we get the corresponding years. 
+
+The last thing I want to cover in this section is using a pipe operator which is symbolized in R as %>%. The pipe operator is like saying "then" if we were writing a sentence. So, for example, we can tell R to select a column *THEN* filter a row *THEN* arrange that row.
+
+##### Example 9: Lets combine select, filter, and arrange by using the pipe operator to select the columns entity, year, and prevalence then filter the row prevalence to include variables higher than 15, then arrange prevalence in descending order.
+
+```{r}
+substancedisorder %>%
+  select(entity, year, prevalence) %>%
+  filter(prevalence > 15) %>%
+  arrange(desc(prevalence))
+```
+
+Again, the order that you choose to select, filter, and arrange matters. For example, if you try to filter by a column that is not included in the select() argument, you may run into issues, so be sure to pay close attention!
+
+###########
+###########
+
+# Restructuring Data
+
+One important thing to learn when it comes to managing and cleaning data is restructuring, and the difference between tidy and untidy data. Tidy data is a specific structure or format of data that is the easiest to use in R
+
+##### This is how to identify tidy data:
+1. each variable has its own column, each observation has its own row, and each value has its own cell
+2. basically, everything has its own place and it can be easily utilized.
+
+With that being said, not all data we encounter will be in tidy format. There's going to be lots of times that we are given untidy data and we need to make it tidy.
+
+Here are some functions we can use to make untidy data tidy.
+
+Note: these methods largley depend on what your untidy data originally looks like. This should't be considered a solution to all untidy data.
+
+##### Function 1: gather()
+` r template: gather(data-frame, old_column1 = "new_column1", old_column2 = "new_column2") `
+For example, lets say our substancedisorder table had prevalence split up across two columns with n observations in each cell. This would be an example of untidy data. To fix that issue, we could do the following:
+
+` r example code: gather(substancedisorder, key = "prevalence", value = "number of observations", 2, 3) `
+Doing this would gather the values that were the previous prevalence headers and move them into one column, and then make a new column for number of observations. Note: The "2,3" after making the number of observations column tells R how many columns we are collapsing into one.
+
+
+##### Function 2: spread()
+` r template: spread(data-frame, key = name of key variable, value = name of value variable) `
+
+The key varible is the variable that stores multiple variables -- for example, in our data substancedisorder, the key variable is year. The value variable is the variable containing the actual value being measure. In our data, the value variable is prevalence. The point of the spread() function here is to spread the variables in the key column across their own separate columns.
+
+Example using spread()
+` r code: spread(substancedisorder, key = year, value = prevalence)`
+
+```{r}
+spread(substancedisorder, key = year, value = prevalence)
+```
+
+This spreads all the values of year across their own columns, with the prevalence in each cell.
+
+Note: notice that in the gather() function, we use quotation marks around the *new column* names, where in spread() we do not use quotation marks at all. This is because in gather() we are actually creating a new variable, but in  spread() we are just spreading out already *existing* variables.
+
+One more useful thing that we can learn to help us manage our data is joining data-sets. There will likely be several times where we have two different data sets with useful information and we wish to combine that information into one table.
+
+One function that can help us with this is the bind_cols() function. This function is particularly useful when we have two tables that have the same observations in the same order. 
+
+Imagine we had two tables for substancedisorder, and the observations were in the same order:
+1. Table one had columns entity and year
+2. Table two had columns code and prevalence
+
+How could we combine this into one big table?
+
+` r template code: table1 %>% bind_cols(table2) `
+
+Now, this seems like a pretty simple way to combine two tables. However, there is a major disadvantage here to take note of. If you are trying to use this method to combine two tables that are quite long, R cannot tell for certain that the rows and observations line up exactly in the correct order. Therefore, I would recommend only using this method when you can be certain everything lines up in the exact same order. For example, to combine two tables that have a *very small* amount of rows.
+
+Now, lets say we had two tables for substancedisorder that had the same columns, but different observations.To combine these two tables, we can use the bind_rows() function. This function will essentially stack the tables on top of each other. 
+
+##### Example: Lets say we had table 1 with the first half of observations for our substancedisorder data and table 2 with the second half of observations for our substancedisorder data. To combine these two tables:
+
+` r template code: table1 %>% bind_rows(table2) `
+
+Often times, there will be situations where you will have duplicate observations when we combine two tables. The way around this issue is to take advantage of the  union() function. The union function combines each row that appears in both of the data-sets, but it conveniently removes any duplicate copies.
+
+` r template: table1 %>% union(table2) `
+
+Easy, and convenient!
+
+###########
+###########
+
+# Creating Graphical Displays
+
+One of the most important tools in an exploratory analysis is creating graphical displays and visualizations of your data. This helps you to notice any trends, areas of concerns, and to make predictions/hypotheses. In R, one of the most helpful packages for creating these visualizations is ggplot2. Conveniently, ggplot2 is another package that is part of the tidyverse!
+
+Lets look at a data set that shows the share of the population with depression.
+
+```{r}
+Depression <- owid("share-with-depression") #assigning the data to the name depression
+as_tibble(Depression) #making the data a tibble since it is a large data-frame
+view(Depression) #looking at the data-frame
+```
+
+Again, I want to rename the prevalence variable since it is long and will become extremely tedious to use if it is not changed. Refresher on renaming variables:
+1. clean it up with the janitor package (this will remove spaces and special characters)
+2. use clean_names argument
+3. use rename argument. Remember, rename(newname=oldname)
+
+Note: we are going to do this using the pipe operator like before. Also, note that we can rename multiple variables by separating the variables with a comma. This is a common feature throughout R.
+
+```{r}
+
+Depression <- Depression %>%
+  clean_names() %>%
+  rename (prev_depression = prevalence_depressive_disorders_sex_both_age_age_standardized_percent)
+
+view(Depression) #it's always good to view your results and make sure the code did what you wanted it to!
+```
+
+Now that we have the variable names in an easier-to-use format, we can get on to doing some visualizations! We can make lots of different plots using ggplot2. I will show how to make just a handful of common ones.
+
+Some important things to know before we start plotting is how ggplot2 works:
+1. ggplot2 works in layers
+2. the first layer is the dataset
+3. the second layer are the coordinates 
+4. the third layer are the geoms, which are what we choose to visualize our data points
+
+Here is the very basic template for ggplot that incorporates all 3 layers above:
+
+ggplot(data=data-frame) + 
+   geom_ (mapping = aes(x = x-variable, y = y-variable))
+   
+The argument that you put after "geom_" will tell R what kind of geoms to use, and therefore what kind of plot we are making
+
+##### Example 1: Lets make a chart that visualizes the prevalence of a few different countries (lets just choose a few since this data-set has a ton of different countries listed)
+
+First, we need to choose which countries we want to compare. Lets look at: United States, United Kingdom, Mexico, and China. We need to refine our dataset to only include these countries. We can do this by combining some of the skills we learned earlier. Lets try to do this by filtering out rows.
+
+```{r}
+depression_sorted <- filter(Depression,  entity  == "United States" | entity == "United Kingdom" | entity == "Mexico" | entity == "China")
+view(depression_sorted)
+```
+
+Now we have a data set containing the countries we want to compare. Now lets visualize this.
+
+```{r}
+ggplot(data=depression_sorted) +
+  geom_point(mapping = aes(x=year, y=prev_depression, color=entity))
+```
+
+This produced a plot for us that shows the prevalence of depression for each of the countries we selected. Now we can use this to note some patterns and develop some questions:
+
+1. According to this data and the chart we produced, we see that the US has the highest prevalence of depression and Mexico has the lowest, 
+2. We can also see that the UK and China had a slight decrease in the prevalence of depression in the mid-2000s,
+3. We can also see that the prevalence of depression in Mexico and the US is on a slight upwards trend.
+
+Our data only contains information on the prevalence of depression in these countries. However, if we had more information, after looking at this data we could investigate *why* certain countries are on a downwards trend and some are on an upwards trend. We could potentially look into some demographics such as age, socioeconomic status, employment status, etc. that could help explain what we are seeing visually.
+
+##### Example 2: Lets create a side-by-side boxplot for the prevalence of depression by entity so that we can see the spread of data for each country.
+
+```{r}
+ggplot(data=depression_sorted) +
+  geom_boxplot(mapping=aes(x=entity, y=prev_depression, fill=entity))
+```
+
+This produced a nice side-by-side boxplot for us to visualize the spread of depression prevalence for each country we picked. Out of the four countries we picked, we can see that Mexico has the tightest spread of data points, but it does appear to have an outlier.The other three countries have a little bit of a wider spread of data, but no major outliers.
+
+
+##### Example 3: lets create a histogram to look at the distribution of prevalence for our whole dataset:
+
+```{r}
+ggplot(data=Depression) +
+  geom_histogram(mapping = aes(x=prev_depression))
+```
+
+This histogram is showing us the distribution of prevalence in the whole depression dataset. This is telling us that the data looks right-skewed, and that having a prevalence of depression around 3.5-4.0 is the most common
+
+
+Lastly, I want to quickly go over how to create summaries of our data. Summaries can be beneficial to look at because they give us information on things like:
+- The range of our data, 
+- a comparison of our mean and median, 
+- and what our standard deviation is.
+
+This can be useful information when we want to have the numbers to in addition to the graphics to describe the spread of our data.
+
+##### Example 5: summarizing our depression data for the US
+
+```{r}
+Depression %>%
+  filter(entity == "United States") %>%
+  summarize(max = max(prev_depression), min=min(prev_depression), mean = mean(prev_depression), median = median(prev_depression), std = sd(prev_depression))
+```
+
+This gives us a 1x5 tibble containing the max, min, mean, median, and standard deviation of depression prevalence for the US. We can do this for any of the countries in our data set and compare them. 
+
+##### Example 6: compare the summaries for Mexico and compare to the US:
+
+```{r}
+Depression %>%
+  filter(entity == "Mexico") %>%
+  summarize(max = max(prev_depression), min=min(prev_depression), mean = mean(prev_depression), median = median(prev_depression), std = sd(prev_depression))
+```
+
+Like we saw with our visualizations, we can see that the US has a migher mean for depression prevalence than Mexico. But now, we are able to put specific numbers to that comparison. We now know that the mean prevalence of depression in the US is 4.74 and the mean prevalence of depression in Mexico is 2.75, a difference of 1.99.
+
+Like I said, creating visualizations is such an important part of data science/statistics so that we can get a full picture of what our data is trying to tell us. With that being said, we need to know the right kinds of plots to make according to our data.Here is a little cheat-sheet to know what kind of plots to make if you are unsure.
+
+###### One variable:
+1. One continuous variable: histogram (geom_histogram) or dotplot (geom_dotplot)
+2. One discrete variable: bar chart (geom_bar)
+
+###### Two variables:
+1. Both continuous: scatter plot (geom_point), line chart (geom_quantile)
+2. Both discrete:  count chart (geom_count) jitter chart (geom_jitter)
+3. One of each: box plot(geom_boxplot), column chart (geom_col)
+
+###### Three variables: 
+1. geom_contour 
+2. geom_tile
+
+There are many more plot options than the ones I just showed you, but these are a good start to knowing how to visualize your data.
+
+#############
+#############
+
+# Simulating Data
+
+Why is simulating data important? Simulating data is important in statistics and data science because it allows us to generate random values that could help us validate our modeling and avoid bias.
+
+##### How can we simulate data in R?
+
+Most people have heard of random number generating in excel, but there is a great way to do this in R too! In R, we can simulate data for different types of probability distributions, like: 
+- Normal distributions, Poisson distributions, and Binomial distributions. 
+
+Here are the functions we can use:
+1. norm, 
+2. dnorm, 
+3. pnorm, 
+4. and rpois. 
+
+In this section I want to focus on simulating random numbers/data, which means we are going to focus on the functions that start with "r" (Ex: rnorm and rpois). 
+
+rnorm: this allows us to simulation normal variates and it also produces a mean and standard devaition of the data
+rpois: this allows us to simulate random data for a Poisson distribution
+
+Note: I will mainly be using rnorm here, just remember that this can also be done with rpois.
+
+Here are some examples:
+
+##### Example 1: Let's start with rnorm, simulating data for a normal distribution for mean = 1 and standard deviation = 0 and n = 10. A normal distribution is one of the first things you learn about in an intro-stats class, and it is one of the most commonly talked about distributions throughout statistics.
+
+` r template: rnorm(n, mean = __, sd = __) `
+` r code: rnorm(10, mean = 0, sd = 1) `
+
+```{r}
+rnorm(10, mean = 0, sd = 1) 
+```
+
+This generates 10 random numbers for us following the parameters of mean = 0 and sd = 1
+
+Here's another way to simulate 10 random numbers for mean = 0 and sd = 1:
+
+Assign rnorm(10) to x (or anything you want), and then view x. Note: We get different numbers generated between the two methods because this is a random number generator.
+
+By assigning rnorm(10) to x, its like telling R to save theses numbers. We will be able to reuse these numbers instead of having new numbers every time. 
+
+Note: By not including mean = 0 and sd = 1 in the example below, R is just assuming mean = 0 and sd = 1 to be the default values. 
+
+x <- rnorm(10) 
+
+x 
+
+```{r}
+x <- rnorm(10) 
+
+x 
+```
+
+
+What does it look like if we change the mean and sd from the default values? Let's look at normal distribution for 50 values, mean = 10, and sd = 5. let's assign this to the letter r:
+
+r <- rnorm(50, mean = 10, sd = 5)
+
+r
+```{r}
+r <- rnorm(50, mean = 10, sd = 5)
+
+r
+```
+
+We get 50 random numbers with much larger values than when we did mean = 0 and sd = 1. Lets look at the 5 number summaries for both x and r to compare:
+
+summary(x)
+
+summary(r)
+
+```{r}
+summary(x)
+
+summary(r)
+
+```
+We see that when comparing the summaries of r and x, r has a much larger range of values and that the median and mean are both much higher. This was to be expected since we increased the mean and sd of r!
+
+Now that we learned the basics of how to produce random numbers, we need to learn how to make these numbers/results reproducible. We can do this by setting a seed. The set.seed() function does this for us. When you set the seed, you can set it to any number you want, just be sure it is something easy to remember and simple to use (i.e. I wouldn't recommend using a 10-digit number as that could become annoying to use and it could become easy to make a typo).
+
+##### Example: Lets set the seed for using the same mean and sd we used above (mean = 20 and sd = 5)
+
+set.seed(1)
+rnorm (50, mean = 20, sd = 5)
+
+```{r}
+set.seed(1)
+rnorm (50, mean = 20, sd = 5)
+```
+
+This ensures that whenever we use seed(1), we get the same numbers we produced with the rnorm statement above.
+
+Simulating random numbers can be a useful thing to do as a statistician, however, we are also able to simulate results/values that come from a specific model that we want to validate.
+
+Lets simulate numbers from a simple linear regression model using a normal distribution! Remember, a SLR line equation looks like this:
+
+### **y = beta_0 + (beta_1 * x) + e**
+
+This means we need to simulate the values for x and e separately!
+
+First, lets set the seed:
+set.seed(5)
+
+```{r}
+set.seed(5)
+```
+
+Next, lets simulate x (lets do 200 values, mean = 5, sd = 1):
+x <- rnorm(200, mean = 5, sd = 1)
+x
+
+```{r}
+x <- rnorm(200, mean = 5, sd = 1)
+x
+```
+
+Next, lets simulate the error term (200 values, mean = 5, sd = 2):
+e <- rnorm(200, mean = 5, sd = 2)
+e
+
+```{r}
+e <- rnorm(200, mean = 5, sd = 2)
+e
+```
+
+Now, lets put these values in the SLR model:
+y <- 10 + 2 * x + e
+y
+
+```{r}
+y <- 10 + 2 * x + e
+y
+```
+
+Last, lets look at the summary of our model and make a simple plot of our values for x and y:
+summary(y)
+plot(x,y)
+
+```{r}
+summary(y)
+plot(x,y)
+```
+
+Done! We just successfully simulated a SLR model that follows a normal disrtibution! The awesome thing is, we can do this for all sorts of distributions too like binary and poisson distributions!
+
+To do this for a binary distribution, we would have used the rbinom() argument instead.
+
+To do this for a Poisson distribution, we would have used the rpois argument, and taken the exponential value of the mean from a normal distribution.
+
+##### Example of how to simulate a Poisson distrubution model: 
+Again, this super important to set the seed so we can reproduce these results!
+` r code: set.seed(10)` 
+
+```{r}
+set.seed(10)
+```
+
+This simulates the predictor variable x as before:
+` r code: x_norm <- rnorm (200, mean = 0, sd = 1)`
+
+```{r}
+x_norm <- rnorm (200, mean = 0, sd = 1)
+```
+
+This calculates the log mean of the model:
+` r code: log_mean <- 5 + 1 * x_norm` 
+
+```{r}
+log_mean <- 5 + 1 * x_norm
+```
+
+This takes the exponential value to make it a Poisson distrubution:
+` r code: y_pois <- rpois (200, exp(log_mean))`
+
+```{r}
+y_pois <- rpois (200, exp(log_mean))
+```
+
+As before, this gives us the 5-number summary:
+` r code: summary(y_pois) `
+
+```{r}
+summary(y_pois)
+```
+
+Again, as before, this gives us a basic y vs x plot that shows us what our model looks like.
+` r code: plot(x_norm, y_pois)`
+
+```{r}
+plot(x_norm, y_pois)
+```
+
+Done! We successfully simulated random data, an SLR model, and a Poisson Distribution!                  
+
+###########
+###########
+
+# Common Errors in R
+
+When you are new to a programming language, it is easy to get frustrated when errors occur. Especially if you don't understand what those error messages are trying to tell you. Most of the time, error messages can be resolved pretty easily if you know what to look for. Below are some of the most common error messages, and some things to go back and double check your code for in attempt to resolve the error.
+
+
+##### 1. Error message: "could not find function"
+What it means: this means that r could not find the function you are trying to use.
+How to fix this: first, always double check that you do not have any typos. Remember - R is case sensitive, so make sure you keep your cases consistent. This could also mean that the package required to use this function is not loaded. Double check that all your necessary packages are loaded, and worst case scenario, save your work, restart R, and reload your packages.
+
+
+##### 2. Error message: "Error in if:
+What it means: this means that there is an issue in your conditional statement.
+How to fix this: make sure that your data is logical, and that there aren't any missing values messing up your conditional statement(s).
+
+
+##### 3. Error message: "Error in eval"
+What it means: This means that you have probably referenced an object that doesn't exist.
+How to fix this: Make sure that there are no typos, and that you are being mindful about case-sensitivity.
+
+
+##### 4. Error message: "cannot open the connections"
+What it means: This likely means that a file or a connection cannot be opened simply because R cannot find it.
+How to fix it: make sure that if you are using a file path, that this path is correct.As always, make sure there are not typos or case issues and make sure that you are not missing something like a forward slash.
+
+
+##### 5. Error message: "unexpected symbol in..."
+What it means: This is a simple fix and likely means that you just forgot to add a comma somewhere.
+How to fix it: Go back to your code and make sure commas and other punctuation are in the correct spot.
+
+
+Of course, there is so much more to learn about R here than what I showed you. However, these are the basics and will set you on the right track to creating some amazing projects in R.
+
+As a last note, I want to leave everyone with some more resources to help expand your ability to use R in addition to the resources I used to create this website and its content.
+
+# Sources
+
+https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
+https://happygitwithr.com/rstudio-git-github.html
+https://www.apreshill.com/blog/2020-12-postcards-distill/
+https://www.rstudio.com/resources/cheatsheets/
+https://www.r-bloggers.com/2016/06/common-r-programming-errors-faced-by-beginners/
