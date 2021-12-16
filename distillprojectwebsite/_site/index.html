@@ -2189,6 +2189,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 # … with 6,458 more rows</code></pre>
 </div>
 <p>This only selected columns “entity” and “prevalence” since those were the only two columns with an “n” in their name! If we had two columns that both started with the suffix “pre” we could have used the helper starts_with() inside of the select argument.</p>
+<p>Other helper functions:</p>
+<p>starts_with(): this can be used to select columns that <em>start</em> with the same prefix. ends_with(): this can be used to select columns that <em>end</em> in the same suffix. contains(): this can be used to select columns that <em>contain</em> the same string of text. matches(): this can be used to select columns that have <em>matching</em> expressions.</p>
 <p>Takeaway: We can select whatever columns we want, in many different ways to make our lives easier!</p>
 <p>Now we are going to learn how to use the filter() argument to extract rows of data and turn them into a new data-frame. <code>r template: filter(data-frame, column-name == "variable-name")</code> One important thing to note in the filter argument is the <strong>double equal sign</strong>. Another important thing to notice is that filter extracts <strong>rows</strong> of an existing data-frame and returns them as a new data-frame.</p>
 <h5 id="example-4-filtering-rows-where-entity-albania">Example 4: Filtering rows where entity = Albania</h5>
@@ -2429,10 +2431,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 </div>
 <p>Now that we have the variable names in an easier-to-use format, we can get on to doing some visualizations! We can make lots of different plots using ggplot2. I will show how to make just a handful of common ones.</p>
-<p>Some important things to know before we start plotting is how ggplot2 works: 1. ggplot2 works in layers 2. the first layer is the dataset 3. the second layer are the coordinates 4. the third layer are the geoms, which are what we choose to visualize our data points</p>
+<p>Some important things to know before we start plotting is how ggplot2 works: 1. ggplot2 works in layers 2. the first layer is the dataset (data argument) 3. the second layer are the coordinates (mapping argument) 4. the third layer is the geometry, which is how we choose to visualize our data points (geom argument)</p>
 <p>Here is the very basic template for ggplot that incorporates all 3 layers above:</p>
 <p>ggplot(data=data-frame) + geom_ (mapping = aes(x = x-variable, y = y-variable))</p>
 <p>The argument that you put after “geom_” will tell R what kind of geoms to use, and therefore what kind of plot we are making</p>
+<p>Within the aes argument is where we define what are x and y variables are, along with any special effects we might want to include such as representing groups with different sizes, shapes, and colors.</p>
 <h5 id="example-1-lets-make-a-chart-that-visualizes-the-prevalence-of-a-few-different-countries-lets-just-choose-a-few-since-this-data-set-has-a-ton-of-different-countries-listed">Example 1: Lets make a chart that visualizes the prevalence of a few different countries (lets just choose a few since this data-set has a ton of different countries listed)</h5>
 <p>First, we need to choose which countries we want to compare. Lets look at: United States, United Kingdom, Mexico, and China. We need to refine our dataset to only include these countries. We can do this by combining some of the skills we learned earlier. Lets try to do this by filtering out rows.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -2509,8 +2512,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <h5 id="example-1-lets-start-with-rnorm-simulating-data-for-a-normal-distribution-for-mean-1-and-standard-deviation-0-and-n-10.-a-normal-distribution-is-one-of-the-first-things-you-learn-about-in-an-intro-stats-class-and-it-is-one-of-the-most-commonly-talked-about-distributions-throughout-statistics.">Example 1: Let’s start with rnorm, simulating data for a normal distribution for mean = 1 and standard deviation = 0 and n = 10. A normal distribution is one of the first things you learn about in an intro-stats class, and it is one of the most commonly talked about distributions throughout statistics.</h5>
 <p><code>r template: rnorm(n, mean = __, sd = __)</code> <code>r code: rnorm(10, mean = 0, sd = 1)</code></p>
 <div class="layout-chunk" data-layout="l-body">
-<pre><code> [1]  0.72338200 -0.29145738 -0.53281224 -0.66074058 -0.06319152
- [6]  1.27502755  1.26652808  1.56988915 -0.02836657  0.35436317</code></pre>
+<pre><code> [1] -0.33058318  0.27187754 -0.06995971  0.26496419  1.46071368
+ [6]  0.06376461 -0.46026083  1.41532708 -0.31485783  0.91136878</code></pre>
 </div>
 <p>This generates 10 random numbers for us following the parameters of mean = 0 and sd = 1</p>
 <p>Here’s another way to simulate 10 random numbers for mean = 0 and sd = 1:</p>
@@ -2520,31 +2523,32 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <p>x &lt;- rnorm(10)</p>
 <p>x</p>
 <div class="layout-chunk" data-layout="l-body">
-<pre><code> [1] -0.43398226  1.19192342 -0.05717483 -0.61234341 -0.16691125
- [6] -0.45189679 -0.71939837  0.79771009 -0.83618724 -1.53785681</code></pre>
+<pre><code> [1] -1.3955173 -0.7492540 -0.0883171  0.6000715 -0.6750285  1.7196238
+ [7] -0.1151562 -1.0356773 -0.4888938 -1.1004333</code></pre>
 </div>
 <p>What does it look like if we change the mean and sd from the default values? Let’s look at normal distribution for 50 values, mean = 10, and sd = 5. let’s assign this to the letter r:</p>
 <p>r &lt;- rnorm(50, mean = 10, sd = 5)</p>
 r
 <div class="layout-chunk" data-layout="l-body">
-<pre><code> [1] 12.122183  9.638608  8.877435  4.637951 12.783859 16.213558
- [7]  9.416814 17.375680 10.533823 19.404536  7.477551 11.233397
-[13] 10.849192 14.178462 13.046885  5.793018 13.656954 10.772188
-[19] 18.140034  9.794177  6.350558 12.752163  7.309125  1.288136
-[25] 24.510008 12.940634  8.659188  9.574049  5.340550 12.553320
-[31]  8.219366  2.927801  5.680411 10.676949  2.339855  8.030313
-[37] 12.524833 18.097365  3.884412 19.727718 17.780980  8.595801
-[43] 16.420528  9.173655  8.926459  9.137858  9.332234  5.779354
-[49]  7.888330  5.612186</code></pre>
+<pre><code> [1] 10.22202592  4.22756747 -2.01062989 17.21937085 11.43940502
+ [6]  9.35954673  6.66862388 12.63653382  9.63340767  0.07149453
+[11]  9.26499620  5.01487367 15.69718594  9.49440892  6.83932207
+[16] 19.40495714 14.87629393 11.56290698  8.53618060 16.94681187
+[21] 21.06185516  4.93382334  5.74797533 20.98815937  7.92377287
+[26] 12.92174790  6.59725533 -6.92079241 10.19760800  6.59156524
+[31]  6.52017845 14.24846223  3.79762956  3.51874945  9.10384134
+[36]  2.28399741  5.70786043  7.37004333  7.60979509 13.75601775
+[41] 10.25770596  3.08329213  8.25376913 15.43258454  9.62692609
+[46] 15.17214559  5.17693541 14.40735729 10.75665937 15.44785065</code></pre>
 </div>
 <p>We get 50 random numbers with much larger values than when we did mean = 0 and sd = 1. Lets look at the 5 number summaries for both x and r to compare:</p>
 <p>summary(x)</p>
 <p>summary(r)</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
--1.53786 -0.69263 -0.44294 -0.28261 -0.08461  1.19192 </code></pre>
+-1.39552 -0.96407 -0.58196 -0.33286 -0.09503  1.71962 </code></pre>
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  1.288   7.580   9.606  10.560  12.901  24.510 </code></pre>
+ -6.921   5.941   9.312   9.374  13.547  21.062 </code></pre>
 </div>
 <p>We see that when comparing the summaries of r and x, r has a much larger range of values and that the median and mean are both much higher. This was to be expected since we increased the mean and sd of r!</p>
 <p>Now that we learned the basics of how to produce random numbers, we need to learn how to make these numbers/results reproducible. We can do this by setting a seed. The set.seed() function does this for us. When you set the seed, you can set it to any number you want, just be sure it is something easy to remember and simple to use (i.e. I wouldn’t recommend using a 10-digit number as that could become annoying to use and it could become easy to make a typo).</p>

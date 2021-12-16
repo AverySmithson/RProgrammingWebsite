@@ -100,6 +100,14 @@ select(substancedisorder, contains("n"))
 
 This only selected columns "entity" and "prevalence" since those were the only two columns with an "n" in their name! If we had two columns that both started with the suffix "pre" we could have used the helper starts_with() inside of the select argument.
 
+Other helper functions:
+
+starts_with(): this can be used to select columns that *start* with the same prefix.
+ends_with(): this can be used to select columns that *end* in the same suffix.
+contains(): this can be used to select columns that *contain* the same string of text.
+matches(): this can be used to select columns that have *matching* expressions.
+
+
 Takeaway: We can select whatever columns we want, in many different ways to make our lives easier!
 
 Now we are going to learn how to use the filter() argument to extract rows of data and turn them into a new data-frame. 
@@ -292,9 +300,9 @@ Now that we have the variable names in an easier-to-use format, we can get on to
 
 Some important things to know before we start plotting is how ggplot2 works:
 1. ggplot2 works in layers
-2. the first layer is the dataset
-3. the second layer are the coordinates 
-4. the third layer are the geoms, which are what we choose to visualize our data points
+2. the first layer is the dataset (data argument)
+3. the second layer are the coordinates (mapping argument)
+4. the third layer is the geometry, which is how we choose to visualize our data points (geom argument)
 
 Here is the very basic template for ggplot that incorporates all 3 layers above:
 
@@ -302,6 +310,8 @@ ggplot(data=data-frame) +
    geom_ (mapping = aes(x = x-variable, y = y-variable))
    
 The argument that you put after "geom_" will tell R what kind of geoms to use, and therefore what kind of plot we are making
+
+Within the aes argument is where we define what are x and y variables are, along with any special effects we might want to include such as representing groups with different sizes, shapes, and colors.
 
 ##### Example 1: Lets make a chart that visualizes the prevalence of a few different countries (lets just choose a few since this data-set has a ton of different countries listed)
 
